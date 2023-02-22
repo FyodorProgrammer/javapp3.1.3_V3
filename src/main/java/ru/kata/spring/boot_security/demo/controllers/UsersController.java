@@ -1,5 +1,6 @@
 package ru.kata.spring.boot_security.demo.controllers;
 
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.ui.Model;
@@ -8,6 +9,7 @@ import ru.kata.spring.boot_security.demo.entenies.User;
 import ru.kata.spring.boot_security.demo.services.UserService;
 
 import java.security.Principal;
+import java.util.Optional;
 
 @Controller
 @RequestMapping
@@ -28,9 +30,11 @@ public class UsersController {
 
     @GetMapping("/user")
     public String getAllUsers(Principal principal, Model model) {
-        User user = userService.getUserByName(principal.getName());
-        model.addAttribute("user", user);
+        Optional<User> user = userService.getUserByName(principal.getName());
+        if (!user.isPresent()) {
+            throw new UsernameNotFoundException(String.format("User '%s' not found", principal.getName()));
+        }
+        model.addAttribute("user", user.get());
         return "user";
     }
-
 }

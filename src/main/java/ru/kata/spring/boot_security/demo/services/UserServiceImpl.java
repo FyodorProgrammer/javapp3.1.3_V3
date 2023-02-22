@@ -14,9 +14,7 @@ import ru.kata.spring.boot_security.demo.repositories.RoleRepository;
 import ru.kata.spring.boot_security.demo.repositories.UserRepository;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,13 +41,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User getUserByName(String name) {
-        return userRepository.findByName(name);
+    public Optional<User> getUserByName(String name) {
+        return userRepository.findUserByName(name);
     }
 
     @Transactional
     public void saveUser(User user) {
-        List<Role> roles = new ArrayList<>();
+        Set<Role> roles = new HashSet<>();
         roles.add(roleRepository.getReferenceById(1L));
         user.setRoles(roles);
         userRepository.save(user);
@@ -63,13 +61,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = getUserByName((username));
-        if (user == null) {
+        Optional<User> user = getUserByName(username);
+
+        if (!user.isPresent()) {
             throw new UsernameNotFoundException(String.format("User '%s' not found", username));
         }
 
-        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
-                mapRolesToAuthorities(user.getRoles()));
+        return user.get();
 
     }
     private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Collection<Role> roles) {

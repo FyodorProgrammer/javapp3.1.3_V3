@@ -8,7 +8,7 @@ import ru.kata.spring.boot_security.demo.entenies.User;
 import ru.kata.spring.boot_security.demo.services.UserService;
 
 @Controller
-@RequestMapping
+@RequestMapping("/admin")
 @EnableTransactionManagement
 public class AdminController {
 
@@ -20,36 +20,36 @@ public class AdminController {
 
 
 
-    @GetMapping("/admin")
+    @GetMapping("")
     public String getAllUsers(Model model) {
         model.addAttribute("users", userService.getAllUsers());
         return "allUsers";
     }
 
-    @GetMapping("admin/new")
+    @GetMapping("new")
     public String addUserForm(@ModelAttribute("user") User user) {
         return "new";
     }
 
-    @PostMapping("admin/saveUser")
+    @PostMapping("saveUser")
     public String addUser(@ModelAttribute("user") User userForm) {
 
         userService.saveUser(userForm);
         return "redirect:/admin";
     }
 
-    @GetMapping("admin/{id}/edit")
+    @GetMapping("{id}/edit")
     public String editForm(@PathVariable("id") Long id, Model model) {
         model.addAttribute("user", userService.getUserById(id));
         return "edit";
     }
 
-    @PostMapping("admin/{id}")
+    @PostMapping("{id}")
     public String edit(User user) {
         userService.saveUser(user);
         return "redirect:/admin";
     }
-    @GetMapping("admin/delete/{id}")
+    @GetMapping("delete/{id}")
     public String delete(@PathVariable("id") Long id) {
         userService.deleteUser(id);
         return "redirect:/admin";

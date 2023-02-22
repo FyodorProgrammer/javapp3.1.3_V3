@@ -6,30 +6,7 @@ import javax.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-//@Data
-//@Entity
-//@Table(name = "users")
-//public class User {
-//
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    private Long id;
-//
-//    @Column(name = "name")
-//    private String name;
-//
-//    @Column(name = "lastname")
-//    private String lastName;
-//
-//    @Column(name = "email")
-//    private String email;
-//
-//
-//}
+import java.util.*;
 
 @Data
 @Entity
@@ -39,22 +16,15 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable=false)
     private String name;
-
-    @Column(nullable=false, unique=true)
     private String email;
-
-    @Column(nullable=false)
     private String password;
-
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinTable(
             name="users_roles",
             joinColumns={@JoinColumn(name="user_id", referencedColumnName="id")},
             inverseJoinColumns={@JoinColumn(name="role_id", referencedColumnName="id")})
-    private List<Role> roles = new ArrayList<>();
+    private Set<Role> roles = new HashSet<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -85,6 +55,5 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
 
 }
